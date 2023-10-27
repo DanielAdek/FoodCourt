@@ -1,5 +1,3 @@
-// src/middlewares/logger.middleware.ts
-
 import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 

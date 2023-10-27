@@ -1,11 +1,11 @@
 import {NestFactory} from '@nestjs/core';
 import {INestApplication, Logger} from "@nestjs/common";
-import {AppModule} from './app.module';
 import {SwaggerModule, DocumentBuilder, OpenAPIObject} from '@nestjs/swagger';
 import {GlobalExceptionFilter} from "./exceptions/global.exception";
+import {AppModule} from './app.module';
 
-class MainApplication {
-  private static readonly logger = new Logger(MainApplication.name);
+class Main {
+  private static readonly logger = new Logger(Main.name);
   private static appConfig(app: INestApplication) {
     app.setGlobalPrefix("/api");
     app.enableCors();
@@ -29,7 +29,7 @@ class MainApplication {
     this.apiDocsConfig(app);
 
     await app.listen(process.env.PORT || 8080);
-    this.logger.log("APPLICATION:RUNNING!")
+    this.logger.log("Application::Running")
   }
 
   public static async run() {
@@ -37,4 +37,4 @@ class MainApplication {
   }
 }
 
-MainApplication.run().catch(error => console.log(error.message));
+Main.run().catch(error => console.log(error.message));

@@ -1,35 +1,40 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
-import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
-import Order from '../models/Order.model';
-import OrderLog from "../models/OrderLog.model";
-import { calculateTotalOrderAmount } from '../assets/utils';
+import {BadRequestException, Inject, Injectable, NotFoundException} from '@nestjs/common';
+import Objection, {ModelClass} from "objection";
+import {Order} from '../../domain/models/Order.model';
+import OrderLog from "../../domain/models/OrderLog.model";
+import { calculateTotalOrderAmount } from '../assets/utils/order.utils';
+import {IOrderResponse} from "../assets/interface/order.interface";
+import OrderType from "../../domain/models/OrderType.model";
 
 @Injectable()
 export class OrdersService {
+
+  constructor(
+      @Inject("Order") private readonly OrderClass: ModelClass<Order>
+  ) {}
   public async create(data): Promise<Order> {
-    return Order.query().insert(data);
+    return this.OrderClass.query().insert(data);
   }
 
   public async findOne(id: number): Promise<Order> {
-    return Order.query().findById(id);
+    return this.OrderClass.query().findById(id);
   }
 
   public async update(id: number, data): Promise<Order> {
-    return  Order.query().patchAndFetchById(id, data);
+    return this.OrderClass.query().patchAndFetchById(id, data);
   }
 
   public async remove(id: number): Promise<void> {
      await Order.query().deleteById(id);
   }
 
-  public async findAll(query: PaginateQuery): Promise<Paginated<Order>> {
-    const queryBuilder = Order.query();
-    return paginate<Order>(query, queryBuilder, { defaultLimit: 10 });
+  public async findAll(query: { limit: number, page: number }): Promise<Objection.Page<OrderType>> {
+    return this.OrderClass.query().page(query.page, query.limit);
   }
 
-  private async processOrder(orderId: number): Promise<Order> {
+  private async processOrder(orderId: number): Promise<IOrderResponse> {
     // Find the order
-    const order = await Order.query().findById(orderId);
+    const order: IOrderResponse = <unknown>await this.OrderClass.query().findById(orderId) as IOrderResponse;
 
     if (!order) {
       throw new NotFoundException('Order not found');

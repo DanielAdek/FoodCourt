@@ -10,7 +10,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     const status = exception.getStatus ? exception.getStatus() : 500;
 
-    const buildResponse = ApiResponseBuilder.setInfo("Internal Error").setMessage("Error").setStatusCode(500).build();
+    const buildResponse = ApiResponseBuilder.setStatus(false).setMessage("INTERNAL ERROR!").setStatusCode(status).setInfo(exception.message).build();
 
     response.status(status).json(buildResponse);
   }
